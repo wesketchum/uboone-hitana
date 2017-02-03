@@ -8,7 +8,6 @@ CPPFLAGS=-I $(BOOST_INC) \
          -I $(FHICLCPP_INC) \
          -I $(GALLERY_INC) \
          -I $(LARCOREOBJ_INC) \
-         -I $(LARSIMOBJ_INC) \
          -I $(LARDATAOBJ_INC) \
          -I $(NUSIMDATA_INC) \
          -I $(ROOT_INC)
@@ -21,7 +20,6 @@ LDFLAGS=$$(root-config --libs) \
         -L $(GALLERY_LIB) -l gallery \
         -L $(NUSIMDATA_LIB) -l nusimdata_SimulationBase \
         -L $(LARCOREOBJ_LIB) -l larcoreobj_SummaryData \
-        -L $(LARSIMOBJ_LIB) -l larsimobj_Simulation \
         -L $(LARDATAOBJ_LIB) -l lardataobj_RecoBase -l lardataobj_MCBase -l lardataobj_RawData -l lardataobj_OpticalDetectorData -l lardataobj_AnalysisBase
 
 demo_ReadEvent: demo_ReadEvent.cc
