@@ -69,7 +69,7 @@ struct OpFlashTreeObj{
   OpFlashTreeObj() { Clear(); }
 };
 
-int main() {
+int main(int argc, char** argv) {
 
   TFile f_output("demo_ReadOpFlashes_output.root","RECREATE");
 
@@ -88,7 +88,7 @@ int main() {
   
   //We specify our files in a list of file names!
   //Note: multiple files allowed. Just separate by comma.
-  vector<string> filenames { "MyInputFile_1.root" };
+  vector<string> filenames { argv[1] };
 
   //We need to specify the "input tag" for our collection of optical flashes.
   //This is like the module label, except it can also include process name
@@ -100,8 +100,11 @@ int main() {
   //Check the contents of your file by setting up a version of uboonecode, and
   //running an event dump:
   //  'lar -c eventdump.fcl -s MyInputFile_1.root -n 1 | grep opflash '
-  InputTag opflash_tag { "opflashSat" };
-
+  //
+  //we are gonna get fancier here, and do a loop over collections to get beam and cosmic discs
+  std::vector<art::InputTag> opflash_tags;
+  opflash_tags.emplace_back("opflashBeam");
+  opflash_tags.emplace_back("opflashCosmic");
 
   //ok, now for the event loop! Here's how it works.
   //
@@ -121,56 +124,60 @@ int main() {
 	 << "Run " << ev.eventAuxiliary().run() << ", "
 	 << "Event " << ev.eventAuxiliary().event() << endl;
 
-    //Now, we want to get a "valid handle" (which is like a pointer to our collection")
-    //We use auto, cause it's annoying to write out the fill type. But it's like
-    //vector<recob::OpFlash>* object.
-    auto const& opflash_handle = ev.getValidHandle<vector<recob::OpFlash>>(opflash_tag);
 
-    //We can now treat this like a pointer, or dereference it to have it be like a vector.
-    //I (Wes) for some reason prefer the latter, so I always like to do ...
-    auto const& opflash_vec(*opflash_handle);
+    //do the loop over the tags...
+    for (auto const& opflash_tag : opflash_tags){
 
-    //For good measure, print out the number of optical hits
-    cout << "\tThere are " << opflash_vec.size() << " OpFlashes in this event." << endl;
-    
-    //We can fill our histogram for number of op hits now!!!
-    h_flash_per_ev->Fill(opflash_vec.size());
-
-    //We're gonna do this a tad differently now. Let's setup the FindMany, and run our loop
-    //over the handle, so we only do one loop;
-    FindMany<recob::OpHit> ophits_per_flash(opflash_handle,ev,opflash_tag);
-    for (size_t i_f = 0, size_flash = opflash_vec.size(); i_f != size_flash; ++i_f) {
-
-      std::vector<recob::OpHit const*> ophits_vec; //this will hold the output. Note it's a vec of ptrs.
-      ophits_per_flash.get(i_f,ophits_vec); //This fills the output usting the findmany object.
-
-      //initialize/clear out our tree objects
-      flash_vals.Clear();
-
-      //fill some flash info
-      auto const& myflash = opflash_vec[i_f];
-      flash_vals.time = myflash.Time();
-      flash_vals.pe = myflash.TotalPE();
-      flash_vals.y = myflash.YCenter();
-      flash_vals.z = myflash.ZCenter();
-
-      flash_vals.n_hits = ophits_vec.size();
-
-      //loop over the optical hits, and fill that info too
-      flash_vals.n_hits_2pe=0;
-      for(size_t i_oph=0, size_hits = ophits_vec.size(); i_oph!=size_hits; ++i_oph){
-	if(ophits_vec[i_oph]->PE()>2) ++flash_vals.n_hits_2pe;
-	flash_vals.ophit_time[i_oph] = ophits_vec[i_oph]->PeakTime();
-	flash_vals.ophit_pe[i_oph]   = ophits_vec[i_oph]->PE();
-	flash_vals.ophit_chan[i_oph] = ophits_vec[i_oph]->OpChannel();
-	cout << "\t\tOpChannel is " << ophits_vec[i_oph]->OpChannel() << " " << flash_vals.ophit_chan[i_oph] << endl;
-      }
-
-      //fill the tree. set branch address on ophits to be safe.
-      flashanatree->Fill();
-
-    } //end loop over flashes
-    
+      //Now, we want to get a "valid handle" (which is like a pointer to our collection")
+      //We use auto, cause it's annoying to write out the fill type. But it's like
+      //vector<recob::OpFlash>* object.
+      auto const& opflash_handle = ev.getValidHandle<vector<recob::OpFlash>>(opflash_tag);
+      
+      //We can now treat this like a pointer, or dereference it to have it be like a vector.
+      //I (Wes) for some reason prefer the latter, so I always like to do ...
+      auto const& opflash_vec(*opflash_handle);
+      
+      //For good measure, print out the number of optical hits
+      cout << "\tThere are " << opflash_vec.size() << " OpFlashes in this event." << endl;
+      
+      //We can fill our histogram for number of op hits now!!!
+      h_flash_per_ev->Fill(opflash_vec.size());
+      
+      //We're gonna do this a tad differently now. Let's setup the FindMany, and run our loop
+      //over the handle, so we only do one loop;
+      FindMany<recob::OpHit> ophits_per_flash(opflash_handle,ev,opflash_tag);
+      for (size_t i_f = 0, size_flash = opflash_vec.size(); i_f != size_flash; ++i_f) {
+	
+	std::vector<recob::OpHit const*> ophits_vec; //this will hold the output. Note it's a vec of ptrs.
+	ophits_per_flash.get(i_f,ophits_vec); //This fills the output usting the findmany object.
+	
+	//initialize/clear out our tree objects
+	flash_vals.Clear();
+	
+	//fill some flash info
+	auto const& myflash = opflash_vec[i_f];
+	flash_vals.time = myflash.Time();
+	flash_vals.pe = myflash.TotalPE();
+	flash_vals.y = myflash.YCenter();
+	flash_vals.z = myflash.ZCenter();
+	
+	flash_vals.n_hits = ophits_vec.size();
+	
+	//loop over the optical hits, and fill that info too
+	flash_vals.n_hits_2pe=0;
+	for(size_t i_oph=0, size_hits = ophits_vec.size(); i_oph!=size_hits; ++i_oph){
+	  if(ophits_vec[i_oph]->PE()>2) ++flash_vals.n_hits_2pe;
+	  flash_vals.ophit_time[i_oph] = ophits_vec[i_oph]->PeakTime();
+	  flash_vals.ophit_pe[i_oph]   = ophits_vec[i_oph]->PE();
+	  flash_vals.ophit_chan[i_oph] = ophits_vec[i_oph]->OpChannel();
+	  cout << "\t\tOpChannel is " << ophits_vec[i_oph]->OpChannel() << " " << flash_vals.ophit_chan[i_oph] << endl;
+	}
+	
+	//fill the tree. set branch address on ophits to be safe.
+	flashanatree->Fill();
+	
+      } //end loop over flashes
+    }//end loop over opflash collections
     
     auto t_end = high_resolution_clock::now();
     duration<double,std::milli> time_total_ms(t_end-t_begin);

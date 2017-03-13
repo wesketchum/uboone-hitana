@@ -49,7 +49,7 @@ using namespace art;
 using namespace std;
 
 using namespace std::chrono;
-int main() {
+int main(int argc, char** argv) {
 
   TFile f_output("demo_SimpleOpFlashAna_output.root","RECREATE");
 
@@ -60,8 +60,8 @@ int main() {
   anaAlg.InitROOTObjects(mytree,myhist);
   
   //We specify our files in a list of file names, and our input tag
-  vector<string> filenames { "MyInputFile_1.root" };
-  InputTag opflash_tag { "opflashSat" };
+  vector<string> filenames { argv[1] };
+  InputTag opflash_tag { "opflashBeam" };
 
   //ok, now for the event loop!
   for (gallery::Event ev(filenames) ; !ev.atEnd(); ev.next()) {

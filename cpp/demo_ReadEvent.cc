@@ -21,6 +21,7 @@
 #include "TInterpreter.h"
 #include "TROOT.h"
 #include "TH1F.h"
+#include "TNtuple.h"
 #include "TFile.h"
 
 //"art" includes (canvas, and gallery)
@@ -34,18 +35,21 @@
 using namespace art;
 using namespace std;
 
-int main(){
+int main(int argc, char** argv){
   
   //Let's make a histogram to store event numbers.
   //I ran this before, so I know my event range. You can adjust this for your file!
 
   //note, because I'm in my standalone code now, I'm not going to make this a pointer
   //so I can have nice clean memory
-  TH1F h_events("h_events","Event Numbers;event;N_{events} / bin",100,4500,5000); 
+  TH1F h_events("h_events","Event Numbers;event;N_{events} / bin",100,0,100); 
   
+  //you know, histograms are lame. Let's make a Ntuple!
+  TNtuple nt("nt","Event Ntuple","run:ev:time");
+
   //We specify our files in a list of file names!
   //Note: multiple files allowed. Just separate by comma.
-  vector<string> filenames { "MyInputFile_1.root" };
+  vector<string> filenames { argv[1] };
 
   //ok, now for the event loop! Here's how it works.
   //
@@ -67,12 +71,16 @@ int main(){
     //ok, then we can fill our histogram!
     h_events.Fill(ev.eventAuxiliary().event());
 
+    //fill our ntuple!
+    nt.Fill(ev.eventAuxiliary().run(),ev.eventAuxiliary().event(),ev.eventAuxiliary().time().timeHigh());
+
   } //end loop over events!
 
 
   //and ... write to file!
   TFile f_output("demo_ReadEvent_output.root","RECREATE");
   h_events.Write();
+  nt.Write();
   f_output.Close();
   
 }

@@ -44,7 +44,7 @@ using namespace std;
 
 using namespace std::chrono;
 
-int main() {
+int main(int argc, char** argv) {
 
   TFile f_output("demo_ReadOpFlashes_output.root","RECREATE");
 
@@ -60,7 +60,7 @@ int main() {
   
   //We specify our files in a list of file names!
   //Note: multiple files allowed. Just separate by comma.
-  vector<string> filenames { "MyInputFile_1.root" };
+  vector<string> filenames { argv[1] };
 
   //We need to specify the "input tag" for our collection of optical flashes.
   //This is like the module label, except it can also include process name
@@ -72,7 +72,7 @@ int main() {
   //Check the contents of your file by setting up a version of uboonecode, and
   //running an event dump:
   //  'lar -c eventdump.fcl -s MyInputFile_1.root -n 1 | grep opflash '
-  InputTag opflash_tag { "opflashSat" };
+  InputTag opflash_tag { "opflashBeam" };
 
 
   //ok, now for the event loop! Here's how it works.
