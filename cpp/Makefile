@@ -37,7 +37,7 @@ SimpleOpFlashAna.o: SimpleOpFlashAna.cxx SimpleOpFlashAna.hh
 demo_SimpleOpFlashAna: demo_SimpleOpFlashAna.cc SimpleOpFlashAna.o
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) SimpleOpFlashAna.o -o $@ $<
 
-all: demo_ReadEvent demo_ReadOpFlashes demo_ReadOpFlashes_MakeTree
+all: demo_ReadEvent demo_ReadOpFlashes demo_ReadOpFlashes_MakeTree demo_SimpleOpFlashAna
 
 clean:
 	rm *.o demo_ReadEvent demo_ReadOpFlashes demo_ReadOpFlashes_MakeTree demo_SimpleOpFlashAna
