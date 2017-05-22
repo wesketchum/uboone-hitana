@@ -46,4 +46,10 @@ print 'RUNNING %s'%cmd
 print
 os.system(cmd)
 
+cmd = 'python NHits_vs_Chan.py %s'%inputfile
+print
+print 'RUNNING %s'%cmd
+print
+os.system(cmd)
+
 sys.exit()
