@@ -112,6 +112,8 @@ typedef struct hitTreeObj{
   unsigned int run;
   unsigned int ev;
   unsigned int ch;
+  int   start_tick;
+  int   end_tick;
   float time;
   float time_err;
   float rms;
@@ -127,7 +129,7 @@ typedef struct hitTreeObj{
 
   //function to return branch list"
   std::string BranchString(){
-    std::string str("run/i:ev/i:ch/i:time/F:time_err/F:rms/F:amp/F:amp_err/F:sumadc/F:integral/F:integral_err/F:gof/F:mult/I:idx/I:view/I");
+    std::string str("run/i:ev/i:ch/i:start_tick/i:end_tick/i:time/F:time_err/F:rms/F:amp/F:amp_err/F:sumadc/F:integral/F:integral_err/F:gof/F:mult/I:idx/I:view/I");
     return str;
   }
 } hitTreeObj_t;
@@ -230,6 +232,8 @@ int main(int argc, char** argv) {
       }
 
       //now fill the hit info
+      hitobj.start_tick = hit.StartTick();
+      hitobj.end_tick   = hit.EndTick();
       hitobj.ch = hit.Channel();
       hitobj.time = hit.PeakTime();
       hitobj.time_err = hit.SigmaPeakTime();
