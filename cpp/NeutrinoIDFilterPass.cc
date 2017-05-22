@@ -49,6 +49,7 @@ void print_usage(){
 	    << "\n\tNeutrinoIDFilterPass <input_file_list> <input_tag>"
 	    << "\n\n\tNeutrinoIDFilterPass will read in a list of larsoft files, and "
 	    << "\n\tsee if each event passes or fails the filter."
+	    << "\n\t<input_tag> is of format module:instance:process. You can leave off the last two."
 	    << std::endl;
 }
 
