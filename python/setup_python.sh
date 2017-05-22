@@ -1,0 +1,1 @@
+export PYTHONPATH=/uboone/app/users/wketchum/python_install/lib/python2.7/site-packages:$PYTHONPATH
