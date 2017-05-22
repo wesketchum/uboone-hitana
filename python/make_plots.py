@@ -34,4 +34,16 @@ print 'RUNNING %s'%cmd
 print
 os.system(cmd)
 
+cmd = 'python ROISize.py %s'%inputfile
+print
+print 'RUNNING %s'%cmd
+print
+os.system(cmd)
+
+cmd = 'python HitvsTime.py %s'%inputfile
+print
+print 'RUNNING %s'%cmd
+print
+os.system(cmd)
+
 sys.exit()

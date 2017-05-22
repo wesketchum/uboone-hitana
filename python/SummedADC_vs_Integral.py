@@ -21,10 +21,7 @@ t = f.Get('tree_hit')
 
 arr = tree2array(t)
 
-if (len(arr) > 100000):
-    arr = arr[:100000]
-
-df = pd.DataFrame(tree2array(t))
+df = pd.DataFrame(tree2array(t,stop=100000))
 
 df['summed_to_integral'] = df.apply(lambda x : (x['hit_sumadc']-x['hit_integral']) / (0.5*(x['hit_sumadc']+x['hit_integral'])), axis=1 )
 
@@ -49,4 +46,3 @@ plt.title('Summed ADC to Integral Comparison',fontweight='bold')
 plt.yscale('log')
 plt.legend(loc=1,fontsize=18)
 plt.savefig('summedadc_to_integral_compare.png')
-plt.show()
