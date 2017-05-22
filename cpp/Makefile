@@ -5,6 +5,7 @@
 CPPFLAGS=-I $(BOOST_INC) \
          -I $(CANVAS_INC) \
          -I $(CETLIB_INC) \
+         -I $(CETLIB_EXCEPT_INC) \
          -I $(FHICLCPP_INC) \
          -I $(GALLERY_INC) \
          -I $(LARCOREOBJ_INC) \
@@ -15,8 +16,9 @@ CPPFLAGS=-I $(BOOST_INC) \
 CXXFLAGS=-std=c++14 -Wall -Werror -pedantic
 CXX=g++
 LDFLAGS=$$(root-config --libs) \
-        -L $(CANVAS_LIB) -l canvas_Utilities -l canvas_Persistency_Common -l canvas_Persistency_Provenance \
+        -L $(CANVAS_LIB) -l canvas \
         -L $(CETLIB_LIB) -l cetlib \
+        -L $(CETLIB_EXCEPT_LIB) -l cetlib_except \
         -L $(GALLERY_LIB) -l gallery \
         -L $(NUSIMDATA_LIB) -l nusimdata_SimulationBase \
         -L $(LARCOREOBJ_LIB) -l larcoreobj_SummaryData \
@@ -25,19 +27,10 @@ LDFLAGS=$$(root-config --libs) \
 demo_ReadEvent: demo_ReadEvent.cc
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $<
 
-demo_ReadOpFlashes: demo_ReadOpFlashes.cc hist_utilities.h
+HitAna: HitAna.cc
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $<
 
-demo_ReadOpFlashes_MakeTree: demo_ReadOpFlashes_MakeTree.cc hist_utilities.h
-	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $<
-
-SimpleOpFlashAna.o: SimpleOpFlashAna.cxx SimpleOpFlashAna.hh
-	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -c SimpleOpFlashAna.cxx
-
-demo_SimpleOpFlashAna: demo_SimpleOpFlashAna.cc SimpleOpFlashAna.o
-	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) SimpleOpFlashAna.o -o $@ $<
-
-all: demo_ReadEvent demo_ReadOpFlashes demo_ReadOpFlashes_MakeTree demo_SimpleOpFlashAna
+all: demo_ReadEvent HitAna
 
 clean:
-	rm *.o demo_ReadEvent demo_ReadOpFlashes demo_ReadOpFlashes_MakeTree demo_SimpleOpFlashAna
+	rm *.o demo_ReadEvent HitAna
