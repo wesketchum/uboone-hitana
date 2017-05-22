@@ -141,6 +141,7 @@ void print_usage(){
 	    << "\n\tHitAna <input_file_list> <hit_input_tag> <output_file_name>"
 	    << "\n\n\tHitAna will read in a list of larsoft files, and "
 	    << "\n\tcreate a single ROOT output file with hit and wire info."
+	    << "\n\t<hit_input_tag> is of format module:instance:process. You can leave off the last two."
 	    << std::endl;
 }
 
@@ -166,7 +167,7 @@ int main(int argc, char** argv) {
 
   //hande inputs and outputs
   std::vector<std::string> filenames = create_file_list(argv[1]);
-  art::InputTag hit_tag { argv[2] };
+  art::InputTag hit_tag(argv[2]);
   TFile f_output(argv[3],"RECREATE");
 
   //Create a Tree to store event information

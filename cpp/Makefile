@@ -30,7 +30,10 @@ demo_ReadEvent: demo_ReadEvent.cc
 HitAna: HitAna.cc
 	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $<
 
-all: demo_ReadEvent HitAna
+NeutrinoIDFilterPass: NeutrinoIDFilterPass.cc
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $<
+
+all: demo_ReadEvent HitAna NeutrinoIDFilterPass
 
 clean:
 	rm *.o demo_ReadEvent HitAna
