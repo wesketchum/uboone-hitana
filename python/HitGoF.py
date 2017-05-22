@@ -6,7 +6,7 @@ try:
     import numpy as np
     import pandas as pd
     import ROOT
-    from root_numpy import root2array, root2rec, tree2rec, array2root
+    from root_numpy import root2array, root2rec, tree2array, array2root
 except ImportError:
     print
     print 'Cannot import matplotlib or numpy'
@@ -18,7 +18,7 @@ fname = sys.argv[-1]
 
 f = ROOT.TFile(fname)
 t = f.Get('tree_hit')
-df = pd.DataFrame(tree2rec(t))
+df = pd.DataFrame(tree2array(t))
 
 print 'DataFrame with %i columns and %i entries'%(df.shape[1],df.shape[0])
 
@@ -40,6 +40,7 @@ plt.ylabel("Number of Hits [normalized]",fontweight='bold')
 plt.title('Goodness of Fit Distributions',fontweight='bold')
 plt.yscale('log')
 plt.legend(loc=1,fontsize=18)
+plt.savefig('gof_distributions.png')
 plt.show()
 
 # GoF vs. channel numbers
@@ -51,6 +52,7 @@ plt.xlabel('Channel Number',fontweight='bold')
 plt.ylabel('Goodness of Fit',fontweight='bold')
 plt.title('U Plane GoF vs. Channel Number.',fontweight='bold')
 plt.grid()
+plt.savefig('gof_vs_chan_Uplane.png')
 plt.show()
 
 fig = plt.figure(figsize=(8,6))
@@ -61,6 +63,7 @@ plt.xlabel('Channel Number',fontweight='bold')
 plt.ylabel('Goodness of Fit',fontweight='bold')
 plt.title('V Plane GoF vs. Channel Number.',fontweight='bold')
 plt.grid()
+plt.savefig('gof_vs_chan_Vplane.png')
 plt.show()
 
 fig = plt.figure(figsize=(8,6))
@@ -71,4 +74,5 @@ plt.xlabel('Channel Number',fontweight='bold')
 plt.ylabel('Goodness of Fit',fontweight='bold')
 plt.title('Y Plane GoF vs. Channel Number.',fontweight='bold')
 plt.grid()
+plt.savefig('gof_vs_chan_Yplane.png')
 plt.show()
