@@ -112,8 +112,11 @@ typedef struct hitTreeObj{
   unsigned int run;
   unsigned int ev;
   unsigned int ch;
-  int   start_tick;
-  int   end_tick;
+  unsigned int start_tick;
+  unsigned int end_tick;
+  unsigned int roi_start;
+  unsigned int roi_end;
+  unsigned int roi_size;
   float time;
   float time_err;
   float rms;
@@ -129,7 +132,7 @@ typedef struct hitTreeObj{
 
   //function to return branch list"
   std::string BranchString(){
-    std::string str("run/i:ev/i:ch/i:start_tick/i:end_tick/i:time/F:time_err/F:rms/F:amp/F:amp_err/F:sumadc/F:integral/F:integral_err/F:gof/F:mult/I:idx/I:view/I");
+    std::string str("run/i:ev/i:ch/i:start_tick/i:end_tick/i:roi_start/i:roi_end/i:roi_size/i:time/F:time_err/F:rms/F:amp/F:amp_err/F:sumadc/F:integral/F:integral_err/F:gof/F:mult/I:idx/I:view/I");
     return str;
   }
 } hitTreeObj_t;
@@ -202,13 +205,42 @@ int main(int argc, char** argv) {
     //get handle to hits
     auto const& hit_handle = ev.getValidHandle<std::vector<recob::Hit>>(hit_tag);
     auto const& hit_vec(*hit_handle);
+
+    //get the associations to the recob::Wire objects
+    art::FindOne<recob::Wire> wire_per_hit(hit_handle,ev,hit_tag);
+
     
-    //For good measure, print out the number of optical hits
+    //For good measure, print out the number of hits
     std::cout << "\tThere are " << hit_vec.size() << " hits in this event." << std::endl;
     
     //loop over the hits
-    for(auto const& hit : hit_vec){
+    //for(auto const& hit : hit_vec){
+    for(size_t i_h=0; i_h<hit_vec.size(); ++i_h){
+      
+      auto const& hit = hit_vec[i_h];
+      
+      //get associated wire object
+      auto const& wire = (wire_per_hit.at(i_h)).ref();
+      auto const& roi = wire.SignalROI().find_range((int)(hit.PeakTime()));
 
+      /*
+	//Note: The association to the wire object gives us the full wire.
+	//      One (i.e. you, the reader =p )still needs to find the ROI
+	//      that contains the hit. You can do that using the "find_range"
+	//      utility of the sparse vector. See below!
+	auto const& myrange = wire.SignalROI().find_range(hit.StartTick());
+	std::cout << "\tHit with time " << hit.PeakTime()
+	          << " found in range ["
+	          << myrange.begin_index() << ","
+	          << myrange.end_index() << ")"
+	          << std::endl;
+	auto const& roi_wvfm = myrange.data();
+	for(size_t i_w=0; i_w<roi_wvfm.size(); ++i_w)
+	  std::cout << " tick " << i_w << " in roi" 
+	            << " or tick " i_w+myrange.begin_index() << " in full waveform"
+		    << " has " << roi_wvfm[i_w] << " adc." << std::endl;
+      */
+      
       //do the event tree info
       if(hit.View()==geo::View_t::kU){
 	evobj.nhits_u++;
@@ -235,6 +267,9 @@ int main(int argc, char** argv) {
       //now fill the hit info
       hitobj.start_tick = hit.StartTick();
       hitobj.end_tick   = hit.EndTick();
+      hitobj.roi_start = roi.begin_index();
+      hitobj.roi_end = roi.end_index();
+      hitobj.roi_size = roi.size();	    
       hitobj.ch = hit.Channel();
       hitobj.time = hit.PeakTime();
       hitobj.time_err = hit.SigmaPeakTime();
